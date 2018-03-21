@@ -4,6 +4,7 @@
 #include <iostream>
 #include <limits>
 #include <random>
+#include <sstream>
 #include <string>
 #include <type_traits>
 
@@ -15,6 +16,12 @@ constexpr Key kEmpty = -1;
 
 struct Value {
   Value() { key = kEmpty; }
+  std::string DebugString() const {
+    std::ostringstream m;
+    m << "key:" << key;
+    return m.str();
+  }
+
   Key key;
   int value;
 };
@@ -32,6 +39,7 @@ struct HashOpts {
   void Init(int hash_index, size_t hash, Key k, Value* v) { v->key = k; }
   bool Equals(size_t hash, Key k, const Value& v) const { return k == v.key; }
   bool Empty(const Value& v) const { return v.key == kEmpty; }
+  bool Clear(Value* v) const { return v->key = kEmpty; }
 };
 
 using Table = LpCockooHash<int, Value, HashOpts>;
@@ -39,7 +47,7 @@ using Table = LpCockooHash<int, Value, HashOpts>;
 }  // namespace
 
 TEST(CockooTest, Basic) {
-  Table t(10);
+  Table t(12);
 
   std::mt19937 rand(0);
   for (int i = 0; i < 10; i++) {
